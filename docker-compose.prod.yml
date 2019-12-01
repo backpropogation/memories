@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+    nginx:
+        build:
+            context: ./
+            dockerfile: ./nginx/Dockerfile
+        depends_on:
+            - server
+        ports:
+            - 443:443
+
+    server:
+        build:
+            context: ./
+            dockerfile: ./server/Dockerfile
+        command: gunicorn config.wsgi -c config/gunicorn.py
+        environment:
+            DEBUG: 'True'
+            DATABASE_URL: 'postgres://postgres:@db:5432/postgres'
+
+    db:
+      image: postgres:11.2
+      environment:
+        POSTGRES_DB: postgres
+        POSTGRES_USER: postgres
+      ports:
+        - 5432-5432
